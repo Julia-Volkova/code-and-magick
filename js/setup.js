@@ -43,21 +43,33 @@
   var renderWizard = function (wizard) {
     var wizardElement = similarWizardTemplate.cloneNode(true);
     wizardElement.querySelector('.setup-similar-label').textContent = wizard.name;
-    wizardElement.querySelector('.wizard-coat').style.fill = wizard.coatColor;
+    wizardElement.querySelector('.wizard-coat').style.fill = wizard.colorCoat;
     wizardElement.querySelector('.wizard-eyes').style.fill = wizard.eyesColor;
     return wizardElement;
   };
 
-  var addWizardsInDOM = function () {
+  // Загрузка массива волшебников с сервера
+  var successHandler = function (wizards) {
     var fragment = document.createDocumentFragment();
-    generateRandomAppearance(wizards);
-    for (var j = 0; j < wizards.length; j++) {
-      fragment.appendChild(renderWizard(wizards[j]));
+    for (var i = 0; i < 4; i++) {
+      fragment.appendChild(renderWizard(wizards[i]));
     }
     similarListElement.appendChild(fragment);
   };
-  addWizardsInDOM();
 
+  var errorHandler = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '30px';
+    node.style.padding = '30px 0';
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+
+  window.backend.load(successHandler, errorHandler);
   userDialog.querySelector('.setup-similar').classList.remove('hidden');
 
   // Раскраска основного волшебника по клику на его определенную часть
@@ -99,6 +111,28 @@
   });
   artifactsElement.addEventListener('dragleave', function (evt) {
     evt.target.style.backgroundColor = '';
+    evt.preventDefault();
+  });
+
+  // Отправка данных об игроке на сервер
+  var form = userDialog.querySelector('.setup-wizard-form');
+  var successLoad = function (response) {
+    userDialog.classList.add('hidden');
+  };
+  
+  var errorLoad = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '30px';
+    node.style.padding = '30px 0';
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+  form.addEventListener('submit', function (evt) {
+    window.backend.save(new FormData(form), successLoad, errorLoad);
     evt.preventDefault();
   });
 })();
