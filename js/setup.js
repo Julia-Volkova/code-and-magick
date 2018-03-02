@@ -68,7 +68,7 @@
     document.body.insertAdjacentElement('afterbegin', node);
   };
 
-  window.backend.load(successHandler, errorHandler);
+  window.backend.load(successHandler, errorHandler, 'https://js.dump.academy/code-and-magick/data', 'GET');
   userDialog.querySelector('.setup-similar').classList.remove('hidden');
 
   // Раскраска основного волшебника по клику на его определенную часть
@@ -132,7 +132,7 @@
   };
 
   form.addEventListener('submit', function (evt) {
-    window.backend.save(new FormData(form), successLoad, errorLoad);
+    window.backend.save(successLoad, errorLoad, 'https://js.dump.academy/code-and-magick', 'POST', new FormData(form));
     evt.preventDefault();
   });
 })();
